@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Calendario</title>
+<style>
+body {
+    font-family: Arial;
+    margin: 0;
+    padding: 10px;
+}
+.calendar {
+    width: 100%;
+    text-align: center;
+}
+.header {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+}
+.days, .dates {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+}
+.day, .date {
+    padding: 10px;
+    border: 1px solid #ddd;
+}
+.today {
+    background: #b3e5fc;
+}
+.selected {
+    background: #81c784;
+    color: white;
+}
+</style>
+
+<script>
+let currentDate = new Date();
+let selectedDate = null;
+
+function renderCalendar() {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+
+    document.getElementById("month").innerText =
+        currentDate.toLocaleString("default", { month: "long" }) + " " + year;
+
+    const firstDay = new Date(year, month, 1).getDay();
+    const lastDate = new Date(year, month + 1, 0).getDate();
+
+    let days = "";
+    for (let i = 0; i < firstDay; i++) days += "<div></div>";
+
+    for (let d = 1; d <= lastDate; d++) {
+        const today = new Date();
+        const isToday = d == today.getDate() && 
+                        month == today.getMonth() && 
+                        year == today.getFullYear();
+
+        const isSelected = selectedDate == d;
+
+        days += `<div class="date ${isToday ? "today" : ""} ${isSelected ? "selected" : ""}"
+                 onclick="selectDate(${d})">${d}</div>`;
+    }
+
+    document.getElementById("dates").innerHTML = days;
+}
+
+function prevMonth() {
+    currentDate.setMonth(currentDate.getMonth() - 1);
+    renderCalendar();
+}
+
+function nextMonth() {
+    currentDate.setMonth(currentDate.getMonth() + 1);
+    renderCalendar();
+}
+
+function selectDate(d) {
+    selectedDate = d;
+    renderCalendar();
+
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth() + 1;
+
+    // Mandamos fecha a App Inventor
+    window.AppInventor.setWebViewString(d + "/" + month + "/" + year);
+}
+</script>
+</head>
+
+<body onload="renderCalendar()">
+
+<div class="calendar">
+    <div class="header">
+        <button onclick="prevMonth()">&lt;</button>
+        <div id="month"></div>
+        <button onclick="nextMonth()">&gt;</button>
+    </div>
+
+    <div class="days">
+        <div class="day">Lu</div>
+        <div class="day">Ma</div>
+        <div class="day">Mi</div>
+        <div class="day">Ju</div>
+        <div class="day">Vi</div>
+        <div class="day">Sa</div>
+        <div class="day">Do</div>
+    </div>
+
+    <div id="dates" class="dates"></div>
+</div>
+
+</body>
+</html>
